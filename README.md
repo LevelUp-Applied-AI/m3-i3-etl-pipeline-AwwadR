@@ -3,6 +3,7 @@
 # ETL Pipeline — Amman Digital Market
 
 ## Overview
+This project builds a Python ETL pipeline for the fictional **Amman Digital Market** database.
 
 This project builds a Python ETL pipeline for the fictional **Amman Digital Market** database.
 
@@ -74,7 +75,53 @@ The database should contain:
 
 ---
 
-## How to Run
+### 2. Create and activate a virtual environment
+```bash
+python -m venv .venv
+source .venv/Scripts/activate
+```
+
+### 3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Start PostgreSQL with Docker
+```bash
+docker run -d --name postgres-m3-int \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=amman_market \
+  -p 5433:5432 \
+  -v pgdata_m3_int:/var/lib/postgresql/data \
+  postgres:15-alpine
+```
+
+### 5. Load the schema and seed data
+```bash
+docker cp schema.sql postgres-m3-int:/schema.sql
+docker cp seed_data.sql postgres-m3-int:/seed_data.sql
+
+MSYS_NO_PATHCONV=1 docker exec -it postgres-m3-int psql -U postgres -d amman_market -f /schema.sql
+MSYS_NO_PATHCONV=1 docker exec -it postgres-m3-int psql -U postgres -d amman_market -f /seed_data.sql
+```
+
+### 6. Verify tables
+```bash
+psql -h localhost -p 5433 -U postgres -d amman_market -c "\\dt"
+```
+
+The database should contain these tables:
+- customers
+- products
+- orders
+- order_items
+
+---
+
+## How to run
+
+Run the ETL pipeline with:
 
 ### Base / Customer pipeline
 ```bash
@@ -121,7 +168,10 @@ The customer analytics output contains:
 
 ---
 
-## Quality Checks
+2. Joins orders with:
+   - order_items
+   - products
+   - customers
 
 The customer validation step performs these checks:
 - no null values in `customer_id`
@@ -268,6 +318,18 @@ m3-i3-etl-pipeline-AwwadR/
 - For Git Bash on Windows, `MSYS_NO_PATHCONV=1` was used when loading SQL files into the Docker container.
 
 ---
+
+## Notes
+
+- The ETL uses SQLAlchemy to connect to PostgreSQL.
+- Pandas is used for joins, filtering, aggregation, and validation.
+- The database connection defaults to:
+
+```text
+postgresql+psycopg://postgres:postgres@localhost:5433/amman_market
+```
+
+If needed, this can be overridden with the `DATABASE_URL` environment variable.
 
 ## License
 
