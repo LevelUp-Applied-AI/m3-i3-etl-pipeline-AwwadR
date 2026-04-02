@@ -1,0 +1,20 @@
+{
+  "pipeline_name": "product_analytics",
+  "pipeline_type": "product",
+  "database_url": "postgresql+psycopg://postgres:postgres@localhost:5433/amman_market",
+  "source_tables": {
+    "customers": "customers",
+    "products": "products",
+    "orders": "orders",
+    "order_items": "order_items"
+  },
+  "filters": {
+    "excluded_order_status": "cancelled",
+    "max_quantity": 100
+  },
+  "output": {
+    "table_name": "product_analytics",
+    "csv_path": "output/product_analytics.csv",
+    "quality_report_path": "output/product_quality_report.json"
+  }
+}
