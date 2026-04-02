@@ -270,7 +270,18 @@ def validate_product(df):
 
     return checks
 
+def transform(data_dict):
+    config = {
+        "filters": {
+            "excluded_order_status": "cancelled",
+            "max_quantity": 100
+        }
+    }
+    return transform_customer(data_dict, config)
 
+
+def validate(df):
+    return validate_customer(df)
 
 def get_last_successful_run(engine):
     query = """
